@@ -1,5 +1,11 @@
 'use client';
 
+import {
+  createHackathonProfile,
+  defaultHackathonProfile,
+  hackathonProfileStorageKey,
+  normalizeHackathonProfile,
+} from '@/lib/hackathon-brief';
 import { buildReportMarkdown } from '@/lib/report-export';
 import {
   buildEvidenceFromFiles,
@@ -7,7 +13,7 @@ import {
   sampleFiles,
   type RepoEvidence,
 } from '@/lib/proofkit-core';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import type {
   AnalyzeResponse,
   HackathonBrief,
@@ -39,34 +45,12 @@ const checklistLabels = [
   'Install and test path',
 ];
 
-const defaultHackathonBrief: HackathonBrief = {
-  hackathonName: 'OpenAI Build Week',
-  deadline: 'July 21, 2026 at 5:00 PM PT',
-  requirementsText: [
-    'Working project',
-    'Selected category or track',
-    'Public repository link',
-    'Clear README',
-    'Public demo video under 3 minutes',
-    'Explanation of how Codex/GPT-5.6 were used',
-    '/feedback Codex Session ID',
-    'Install and test path for judges',
-    'Relevant open-source license',
-  ].join('\n'),
-  judgingCriteriaText: [
-    'Technological Implementation',
-    'Design',
-    'Potential Impact',
-    'Quality of Idea',
-  ].join('\n'),
-};
-
 export default function ProofKitDashboard() {
   const [step, setStep] = useState<Step>('upload');
   const [hackathonBrief, setHackathonBrief] = useState<HackathonBrief>(
-    defaultHackathonBrief,
+    defaultHackathonProfile.hackathonBrief,
   );
-  const [track, setTrack] = useState('Developer Tools');
+  const [track, setTrack] = useState(defaultHackathonProfile.track);
   const [projectName, setProjectName] = useState('Untitled hackathon project');
   const [repoUrl, setRepoUrl] = useState('');
   const [demoUrl, setDemoUrl] = useState('');
@@ -75,7 +59,40 @@ export default function ProofKitDashboard() {
   const [report, setReport] = useState<ReadinessReport | null>(null);
   const [error, setError] = useState('');
   const [isParsing, setIsParsing] = useState(false);
+  const [hasLoadedSavedProfile, setHasLoadedSavedProfile] = useState(false);
   const [selectedSource, setSelectedSource] = useState('');
+
+  useEffect(() => {
+    window.setTimeout(() => {
+      try {
+        const savedProfile = window.localStorage.getItem(hackathonProfileStorageKey);
+        if (savedProfile) {
+          const normalized = normalizeHackathonProfile(JSON.parse(savedProfile));
+          if (normalized) {
+            setHackathonBrief(normalized.hackathonBrief);
+            setTrack(normalized.track);
+            setReport(null);
+          }
+        }
+      } catch {
+        // localStorage unavailable
+      } finally {
+        setHasLoadedSavedProfile(true);
+      }
+    }, 0);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedSavedProfile) return;
+    try {
+      window.localStorage.setItem(
+        hackathonProfileStorageKey,
+        JSON.stringify(createHackathonProfile(hackathonBrief, track)),
+      );
+    } catch {
+      // localStorage unavailable
+    }
+  }, [hackathonBrief, hasLoadedSavedProfile, track]);
 
   const localReport = useMemo(() => {
     if (!evidence) return null;
@@ -143,6 +160,17 @@ export default function ProofKitDashboard() {
     value: HackathonBrief[K],
   ) {
     setHackathonBrief((current) => ({ ...current, [key]: value }));
+    setReport(null);
+  }
+
+  function updateTrack(value: string) {
+    setTrack(value);
+    setReport(null);
+  }
+
+  function resetHackathonProfile() {
+    setHackathonBrief(defaultHackathonProfile.hackathonBrief);
+    setTrack(defaultHackathonProfile.track);
     setReport(null);
   }
 
@@ -312,11 +340,12 @@ export default function ProofKitDashboard() {
         demoUrl={demoUrl}
         feedbackSessionId={feedbackSessionId}
         onUpdateBrief={updateHackathonBrief}
-        onTrackChange={setTrack}
+        onTrackChange={updateTrack}
         onProjectNameChange={setProjectName}
         onRepoUrlChange={setRepoUrl}
         onDemoUrlChange={setDemoUrl}
         onFeedbackIdChange={setFeedbackSessionId}
+        onResetProfile={resetHackathonProfile}
         onBack={() => setStep('upload')}
         onAnalyze={() => void handleAnalyze()}
       />

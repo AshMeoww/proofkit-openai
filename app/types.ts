@@ -39,11 +39,6 @@ export type SubmissionItem = {
   detail: string;
 };
 
-export type HackathonBrief = {
-  hackathonName: string;
-  deadline: string;
-  requirementsText: string;
-  judgingCriteriaText: string;
-};
+export type { HackathonBrief } from '@/lib/hackathon-brief';
 
 export type Step = 'upload' | 'requirements' | 'analyzing' | 'report';

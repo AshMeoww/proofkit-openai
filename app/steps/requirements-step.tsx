@@ -19,6 +19,7 @@ type RequirementsStepProps = {
   onRepoUrlChange: (value: string) => void;
   onDemoUrlChange: (value: string) => void;
   onFeedbackIdChange: (value: string) => void;
+  onResetProfile: () => void;
   onBack: () => void;
   onAnalyze: () => void;
 };
@@ -37,6 +38,7 @@ export default function RequirementsStep({
   onRepoUrlChange,
   onDemoUrlChange,
   onFeedbackIdChange,
+  onResetProfile,
   onBack,
   onAnalyze,
 }: RequirementsStepProps) {
@@ -83,6 +85,16 @@ export default function RequirementsStep({
               onChange={(v) => onUpdateBrief('deadline', v)}
               placeholder='July 21, 2026 at 5:00 PM PT'
             />
+          </div>
+          <div className='mt-4 flex items-center justify-between rounded-xl bg-[var(--bg-secondary)] px-4 py-3'>
+            <span className='text-[13px] text-[var(--text-tertiary)]'>Settings autosave locally in your browser.</span>
+            <button
+              type='button'
+              onClick={onResetProfile}
+              className='text-[13px] font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)]'
+            >
+              Reset to default
+            </button>
           </div>
         </Section>
 
