@@ -1,26 +1,90 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --color-pass: #34c759;
+  --color-pass-bg: #f0faf2;
+  --color-warn: #ff9f0a;
+  --color-warn-bg: #fffbf0;
+  --color-fail: #ff3b30;
+  --color-fail-bg: #fff5f5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --font-sans:
+    -apple-system, 'SF Pro Display', 'SF Pro Text', system-ui, 'Helvetica Neue',
+    Helvetica, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.step-enter {
+  animation: stepIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.analyze-ring {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.progress-fill {
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.score-ring-fill {
+  transition: stroke-dashoffset 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drop-zone-active {
+  animation: dropPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes dropPulse {
+  0%,
+  100% {
+    border-color: var(--accent);
+    background: rgba(0, 113, 227, 0.02);
+  }
+  50% {
+    border-color: var(--accent);
+    background: rgba(0, 113, 227, 0.06);
+  }
 }
