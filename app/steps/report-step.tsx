@@ -168,89 +168,138 @@ function RequirementsList({
   hackathonName: string;
   requirements: ReadinessReport['requirements'];
 }) {
+  const [open, setOpen] = useState(true);
+
   return (
     <div className='rounded-2xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.04)]'>
-      <div className='border-b border-[rgba(0,0,0,0.06)] px-6 py-4'>
+      <button
+        type='button'
+        onClick={() => setOpen(!open)}
+        className='flex w-full items-center justify-between px-6 py-4 text-left'
+      >
         <h2 className='text-[17px] font-semibold text-[var(--text-primary)]'>
           {hackathonName || 'Hackathon'} requirements
         </h2>
-      </div>
-      <div className='divide-y divide-[rgba(0,0,0,0.04)]'>
-        {requirements.map((req) => (
-          <div key={req.id} className='flex items-start gap-4 px-6 py-4'>
-            <StatusDot status={req.status} />
-            <div className='min-w-0 flex-1'>
-              <div className='flex items-center justify-between gap-3'>
-                <span className='text-[15px] font-medium text-[var(--text-primary)]'>
-                  {req.label}
-                </span>
-                <StatusTag status={req.status} />
+        <Chevron open={open} />
+      </button>
+      {open && (
+        <div className='divide-y divide-[rgba(0,0,0,0.04)] border-t border-[rgba(0,0,0,0.06)]'>
+          {requirements.map((req) => (
+            <div key={req.id} className='flex items-start gap-4 px-6 py-4'>
+              <StatusDot status={req.status} />
+              <div className='min-w-0 flex-1'>
+                <div className='flex items-center justify-between gap-3'>
+                  <span className='text-[15px] font-medium text-[var(--text-primary)]'>
+                    {req.label}
+                  </span>
+                  <StatusTag status={req.status} />
+                </div>
+                <p className='mt-1 text-[13px] leading-[1.46] text-[var(--text-secondary)]'>
+                  {req.evidence}
+                </p>
+                <p className='mt-0.5 text-[12px] text-[var(--text-tertiary)]'>
+                  {req.action}
+                </p>
               </div>
-              <p className='mt-1 text-[13px] leading-[1.46] text-[var(--text-secondary)]'>
-                {req.evidence}
-              </p>
-              <p className='mt-0.5 text-[12px] text-[var(--text-tertiary)]'>
-                {req.action}
-              </p>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 function RisksList({ risks }: { risks: string[] }) {
+  const [open, setOpen] = useState(false);
+
   if (!risks.length) return null;
 
   return (
     <div className='rounded-2xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.04)]'>
-      <div className='border-b border-[rgba(0,0,0,0.06)] px-6 py-4'>
+      <button
+        type='button'
+        onClick={() => setOpen(!open)}
+        className='flex w-full items-center justify-between px-6 py-4 text-left'
+      >
         <h2 className='text-[17px] font-semibold text-[var(--text-primary)]'>
           Risks
         </h2>
-      </div>
-      <div className='divide-y divide-[rgba(0,0,0,0.04)] px-6'>
-        {risks.map((risk) => (
-          <p
-            key={risk}
-            className='py-3.5 text-[14px] leading-[1.5] text-[var(--text-secondary)]'
-          >
-            {risk}
-          </p>
-        ))}
-      </div>
+        <Chevron open={open} />
+      </button>
+      {open && (
+        <div className='divide-y divide-[rgba(0,0,0,0.04)] border-t border-[rgba(0,0,0,0.06)] px-6'>
+          {risks.map((risk) => (
+            <p
+              key={risk}
+              className='py-3.5 text-[14px] leading-[1.5] text-[var(--text-secondary)]'
+            >
+              {risk}
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 function EvidenceTable({ notes }: { notes: ReadinessReport['evidenceNotes'] }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className='rounded-2xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.04)]'>
-      <div className='border-b border-[rgba(0,0,0,0.06)] px-6 py-4'>
+      <button
+        type='button'
+        onClick={() => setOpen(!open)}
+        className='flex w-full items-center justify-between px-6 py-4 text-left'
+      >
         <h2 className='text-[17px] font-semibold text-[var(--text-primary)]'>
           Evidence
         </h2>
-      </div>
-      <div className='divide-y divide-[rgba(0,0,0,0.04)]'>
-        {notes.slice(0, 10).map((note) => (
-          <div
-            key={`${note.file}-${note.finding}`}
-            className='grid grid-cols-[minmax(0,1fr)_80px_minmax(0,1.5fr)] gap-4 px-6 py-3.5'
-          >
-            <span className='truncate font-mono text-[13px] text-[var(--text-primary)]'>
-              {note.file}
-            </span>
-            <span className='text-[12px] capitalize text-[var(--text-tertiary)]'>
-              {note.confidence}
-            </span>
-            <span className='text-[13px] leading-[1.46] text-[var(--text-secondary)]'>
-              {note.finding}
-            </span>
-          </div>
-        ))}
-      </div>
+        <Chevron open={open} />
+      </button>
+      {open && (
+        <div className='divide-y divide-[rgba(0,0,0,0.04)] border-t border-[rgba(0,0,0,0.06)]'>
+          {notes.slice(0, 10).map((note) => (
+            <div
+              key={`${note.file}-${note.finding}`}
+              className='grid grid-cols-[minmax(0,1fr)_80px_minmax(0,1.5fr)] gap-4 px-6 py-3.5'
+            >
+              <span className='truncate font-mono text-[13px] text-[var(--text-primary)]'>
+                {note.file}
+              </span>
+              <span className='text-[12px] capitalize text-[var(--text-tertiary)]'>
+                {note.confidence}
+              </span>
+              <span className='text-[13px] leading-[1.46] text-[var(--text-secondary)]'>
+                {note.finding}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      width='16'
+      height='16'
+      fill='none'
+      viewBox='0 0 16 16'
+      className={`flex-shrink-0 text-[var(--text-tertiary)] transition-transform duration-200 ${
+        open ? 'rotate-180' : ''
+      }`}
+    >
+      <path
+        d='M4 6l4 4 4-4'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </svg>
   );
 }
 
