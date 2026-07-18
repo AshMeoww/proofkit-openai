@@ -13,24 +13,23 @@ export type HackathonProfile = {
 export const hackathonProfileStorageKey = "proofkit:hackathon-profile:v1";
 
 export const defaultHackathonBrief: HackathonBrief = {
-  hackathonName: "OpenAI Build Week",
-  deadline: "July 21, 2026 at 5:00 PM PT",
+  hackathonName: "OpenAI Global Build Week — Manila",
+  deadline: "July 18, 2026 at 5:00 PM PHT",
   requirementsText: [
-    "Working project",
-    "Selected category or track",
+    "[Gate] Clean start — code, prototypes, and design artifacts begin on Saturday",
+    "[Gate] Runs live — the project itself runs during review (no video/slides/mockup substitutes)",
+    "[Gate] Claims have evidence — if a feature or Codex contribution cannot be shown, judges score as though the claim was not made",
     "Public repository link",
-    "Clear README",
-    "Public demo video under 3 minutes",
-    "Explanation of how Codex/GPT-5.6 were used",
+    "Clear README with install and test path for judges",
+    "Explanation of how Codex was used (specific artifacts, sessions, decisions)",
     "/feedback Codex Session ID",
-    "Install and test path for judges",
+    "Public demo video under 3 minutes",
     "Relevant open-source license",
   ].join("\n"),
   judgingCriteriaText: [
-    "Technological Implementation",
-    "Design",
-    "Potential Impact",
-    "Quality of Idea",
+    "Codex Craft (10 pts) — Did the team use Codex deeply, appropriately, and demonstrably? Look for: specific artifacts, sessions, decisions, steering, recovery from failure, and visible payoff.",
+    "Product Judgment (10 pts) — Did the team choose the right scope and turn it into one coherent, complete core experience? Look for: a clear job, deliberate priorities, sensible boundaries, and cuts that protect the core.",
+    "Problem & Insight (10 pts) — Is the project grounded in a specific problem and audience, with a thoughtful or non-obvious approach? Look for: a named audience, evidence or firsthand knowledge, a solution aimed at the cause of the pain.",
   ].join("\n"),
 };
 
