@@ -1,8 +1,15 @@
 "use client";
 
+import {
+  createHackathonProfile,
+  defaultHackathonProfile,
+  hackathonProfileStorageKey,
+  normalizeHackathonProfile,
+  type HackathonBrief,
+} from "@/lib/hackathon-brief";
 import { buildReportMarkdown, slugifyFileName } from "@/lib/report-export";
 import { buildEvidenceFromFiles, parseZipBytes, sampleFiles, type RepoEvidence } from "@/lib/proofkit-core";
-import { ChangeEvent, DragEvent, KeyboardEvent, useMemo, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type RequirementStatus = "pass" | "warn" | "fail";
 
@@ -45,13 +52,6 @@ type SubmissionItem = {
   detail: string;
 };
 
-type HackathonBrief = {
-  hackathonName: string;
-  deadline: string;
-  requirementsText: string;
-  judgingCriteriaText: string;
-};
-
 const checklistLabels = [
   "Working project",
   "Selected category or track",
@@ -63,31 +63,9 @@ const checklistLabels = [
   "Install and test path",
 ];
 
-const defaultHackathonBrief: HackathonBrief = {
-  hackathonName: "OpenAI Build Week",
-  deadline: "July 21, 2026 at 5:00 PM PT",
-  requirementsText: [
-    "Working project",
-    "Selected category or track",
-    "Public repository link",
-    "Clear README",
-    "Public demo video under 3 minutes",
-    "Explanation of how Codex/GPT-5.6 were used",
-    "/feedback Codex Session ID",
-    "Install and test path for judges",
-    "Relevant open-source license",
-  ].join("\n"),
-  judgingCriteriaText: [
-    "Technological Implementation",
-    "Design",
-    "Potential Impact",
-    "Quality of Idea",
-  ].join("\n"),
-};
-
 export default function ProofKitDashboard() {
-  const [hackathonBrief, setHackathonBrief] = useState<HackathonBrief>(defaultHackathonBrief);
-  const [track, setTrack] = useState("Developer Tools");
+  const [hackathonBrief, setHackathonBrief] = useState<HackathonBrief>(defaultHackathonProfile.hackathonBrief);
+  const [track, setTrack] = useState(defaultHackathonProfile.track);
   const [projectName, setProjectName] = useState("Untitled hackathon project");
   const [repoUrl, setRepoUrl] = useState("");
   const [demoUrl, setDemoUrl] = useState("");
@@ -98,8 +76,46 @@ export default function ProofKitDashboard() {
   const [isParsing, setIsParsing] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDraggingZip, setIsDraggingZip] = useState(false);
+  const [hasLoadedSavedProfile, setHasLoadedSavedProfile] = useState(false);
+  const [profileStatus, setProfileStatus] = useState<"idle" | "loaded" | "saved" | "reset" | "error">("idle");
   const [selectedSource, setSelectedSource] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    window.setTimeout(() => {
+      try {
+        const savedProfile = window.localStorage.getItem(hackathonProfileStorageKey);
+        if (savedProfile) {
+          const normalized = normalizeHackathonProfile(JSON.parse(savedProfile));
+          if (normalized) {
+            setHackathonBrief(normalized.hackathonBrief);
+            setTrack(normalized.track);
+            setReport(null);
+            setProfileStatus("loaded");
+          }
+        }
+      } catch {
+        setProfileStatus("error");
+      } finally {
+        setHasLoadedSavedProfile(true);
+      }
+    }, 0);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedSavedProfile) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        hackathonProfileStorageKey,
+        JSON.stringify(createHackathonProfile(hackathonBrief, track)),
+      );
+    } catch {
+      window.setTimeout(() => setProfileStatus("error"), 0);
+    }
+  }, [hackathonBrief, hasLoadedSavedProfile, track]);
 
   const localReport = useMemo(() => {
     if (!evidence) {
@@ -151,6 +167,20 @@ export default function ProofKitDashboard() {
   function updateHackathonBrief<K extends keyof HackathonBrief>(key: K, value: HackathonBrief[K]) {
     setHackathonBrief((current) => ({ ...current, [key]: value }));
     setReport(null);
+    setProfileStatus("saved");
+  }
+
+  function updateTrack(value: string) {
+    setTrack(value);
+    setReport(null);
+    setProfileStatus("saved");
+  }
+
+  function resetHackathonProfile() {
+    setHackathonBrief(defaultHackathonProfile.hackathonBrief);
+    setTrack(defaultHackathonProfile.track);
+    setReport(null);
+    setProfileStatus("reset");
   }
 
   async function handleZipUpload(event: ChangeEvent<HTMLInputElement>) {
@@ -346,7 +376,24 @@ export default function ProofKitDashboard() {
               onChange={(value) => updateHackathonBrief("deadline", value)}
               placeholder="July 21, 2026 at 5:00 PM PT"
             />
-            <Field label="Track" value={track} onChange={setTrack} />
+            <div className="rounded-md border border-[#e4dbcf] bg-white p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold">Hackathon profile</p>
+                  <p className="mt-1 text-xs leading-5 text-[#766b60]">
+                    {profileStatusMessage(profileStatus, hasLoadedSavedProfile)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={resetHackathonProfile}
+                  className="shrink-0 rounded-md border border-[#c5bbae] px-2 py-1 text-xs font-medium hover:bg-[#f1e9df]"
+                >
+                  Reset preset
+                </button>
+              </div>
+            </div>
+            <Field label="Track" value={track} onChange={updateTrack} />
             <Field label="Project name" value={projectName} onChange={setProjectName} />
             <Field label="Repo URL" value={repoUrl} onChange={setRepoUrl} placeholder="https://github.com/..." />
             <Field label="Demo URL" value={demoUrl} onChange={setDemoUrl} placeholder="https://youtube.com/..." />
@@ -445,6 +492,26 @@ function Field({
       />
     </label>
   );
+}
+
+function profileStatusMessage(status: "idle" | "loaded" | "saved" | "reset" | "error", hasLoadedSavedProfile: boolean): string {
+  if (!hasLoadedSavedProfile) {
+    return "Checking for a saved local profile...";
+  }
+
+  if (status === "loaded") {
+    return "Loaded your saved hackathon settings from this browser.";
+  }
+
+  if (status === "reset") {
+    return "Reset to the OpenAI Build Week preset. Changes save locally.";
+  }
+
+  if (status === "error") {
+    return "Could not access local browser storage. You can still edit this run.";
+  }
+
+  return "Autosaves hackathon settings locally in this browser.";
 }
 
 function TextAreaField({

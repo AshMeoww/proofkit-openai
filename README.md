@@ -6,6 +6,7 @@ ProofKit is a local-first hackathon submission readiness scanner. It lets a buil
 
 - Working project evidence from manifests, setup scripts, lockfiles, and commands.
 - Custom hackathon name, deadline, track/category, requirements, and judging criteria.
+- Browser-local autosave for the current hackathon profile, with a reset back to the OpenAI Build Week preset.
 - Track/category alignment.
 - Public repo, README, demo video, Codex/GPT-5.6 explanation, `/feedback` session ID, and install/test path.
 - Technical implementation signals: setup clarity, runnable commands, testability, and product completeness.
@@ -46,6 +47,8 @@ The dashboard still performs a local evidence scan when the API key is missing.
 
 You can also upload any repository ZIP. ProofKit parses the file tree locally and extracts relevant text evidence before sending a compact summary to the server route.
 
+Hackathon profile edits autosave in the current browser. Use `Reset preset` to restore the bundled OpenAI Build Week configuration.
+
 ## Supported platforms
 
 - Windows, macOS, or Linux with Node.js 20.9 or newer.
@@ -63,6 +66,7 @@ Codex was used to plan, implement, debug, and polish ProofKit, including the rep
 ## Privacy and limitations
 
 - ZIP parsing happens in the browser. Only the compact repository summary is sent to `/api/analyze`.
+- Hackathon profile autosave uses browser `localStorage`; it does not create an account or database record.
 - `.env.local` is intentionally ignored by git. Do not commit API keys.
 - ProofKit does not execute uploaded code. It reviews file evidence and generated instructions, so it should be treated as a readiness assistant rather than a security sandbox.
 - Very large files are summarized by path, kind, and size instead of full content.
