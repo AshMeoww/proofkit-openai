@@ -31,10 +31,14 @@ export type ExportableReadinessReport = {
 
 export type ReportMarkdownInput = {
   projectName: string;
+  hackathonName?: string;
+  deadline?: string;
   track: string;
   repoUrl?: string;
   demoUrl?: string;
   feedbackSessionId?: string;
+  requirementsText?: string;
+  judgingCriteriaText?: string;
   report: ExportableReadinessReport;
   evidence: RepoEvidence;
   generatedAt?: string;
@@ -42,20 +46,27 @@ export type ReportMarkdownInput = {
 
 export function buildReportMarkdown({
   projectName,
+  hackathonName,
+  deadline,
   track,
   repoUrl,
   demoUrl,
   feedbackSessionId,
+  requirementsText,
+  judgingCriteriaText,
   report,
   evidence,
   generatedAt = evidence.generatedAt,
 }: ReportMarkdownInput): string {
+  const normalizedHackathon = hackathonName?.trim() || "Hackathon";
   const lines = [
     `# ProofKit readiness report: ${projectName || "Untitled project"}`,
     "",
     "## Submission metadata",
     "",
     metadataLine("Project", projectName),
+    metadataLine("Hackathon", normalizedHackathon),
+    metadataLine("Deadline", deadline),
     metadataLine("Track", track),
     metadataLine("Repository", repoUrl),
     metadataLine("Demo video", demoUrl),
@@ -69,7 +80,7 @@ export function buildReportMarkdown({
     "",
     report.summary,
     "",
-    "## Build Week requirement checklist",
+    `## ${normalizedHackathon} requirement checklist`,
     "",
     "| Requirement | Status | Evidence | Action |",
     "| --- | --- | --- | --- |",
@@ -86,6 +97,16 @@ export function buildReportMarkdown({
     `| Runnable commands | ${clampScore(report.technicalScores.runnableCommands)} |`,
     `| Testability | ${clampScore(report.technicalScores.testability)} |`,
     `| Product completeness | ${clampScore(report.technicalScores.productCompleteness)} |`,
+    "",
+    "## Hackathon brief",
+    "",
+    "### Requirements",
+    "",
+    ...markdownListFromLines(requirementsText, "No custom requirements provided."),
+    "",
+    "### Judging criteria",
+    "",
+    ...markdownListFromLines(judgingCriteriaText, "No judging criteria provided."),
     "",
     "## Missing-risk items",
     "",
@@ -146,6 +167,15 @@ function listOrFallback(items: string[], fallback: string): string[] {
   }
 
   return items.map((item) => `- ${item}`);
+}
+
+function markdownListFromLines(value: string | undefined, fallback: string): string[] {
+  const items = value
+    ?.split(/\r?\n/)
+    .map((line) => line.replace(/^[-*•\d.)\s]+/, "").trim())
+    .filter(Boolean);
+
+  return listOrFallback(items ?? [], fallback);
 }
 
 function formatStatus(status: ExportRequirementStatus): string {

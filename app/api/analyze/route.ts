@@ -7,11 +7,14 @@ export const dynamic = "force-dynamic";
 type AnalyzeRequest = {
   metadata?: {
     projectName?: string;
+    hackathonName?: string;
     track?: string;
     repoUrl?: string;
     demoUrl?: string;
     feedbackSessionId?: string;
     deadline?: string;
+    requirementsText?: string;
+    judgingCriteriaText?: string;
   };
   evidence?: {
     sourceName?: string;
@@ -165,7 +168,7 @@ export async function POST(request: Request) {
             {
               type: "input_text",
               text:
-                "You are ProofKit, a strict but practical hackathon submission readiness reviewer. Evaluate only the repository evidence provided. Favor concrete, judge-facing gaps. Return the required JSON shape exactly.",
+                "You are ProofKit, a strict but practical hackathon submission readiness reviewer. Evaluate only the repository evidence and hackathon brief provided. Treat the user's hackathon requirements, deadline, track, and judging criteria as authoritative. Favor concrete, judge-facing gaps. Return the required JSON shape exactly.",
             },
           ],
         },
@@ -176,7 +179,7 @@ export async function POST(request: Request) {
               type: "input_text",
               text: JSON.stringify({
                 task:
-                  "Create a Build Week readiness report for a Developer Tools submission due July 21, 2026 at 5:00 PM PT. Include the eight required checklist items, technical scores, missing-risk items, README Codex/GPT-5.6 section, 3-minute demo script, and judge testing instructions.",
+                  "Create a hackathon readiness report customized to the supplied hackathon name, deadline, track, requirements, and judging criteria. Include every explicit requirement from the brief in the checklist when possible, plus core runnable-project/readme/repo/demo/setup/test signals. Produce technical scores, missing-risk items, a README Codex/GPT-5.6 section, a 3-minute demo script tailored to the hackathon, and judge testing instructions.",
                 payload: compactPayload,
               }),
             },

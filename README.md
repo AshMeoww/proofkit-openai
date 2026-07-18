@@ -1,11 +1,12 @@
 # ProofKit
 
-ProofKit is a local-first Build Week submission readiness scanner for the Developer Tools track. It lets a builder upload a project ZIP, extracts repository evidence in the browser, and asks GPT-5.6 for a judge-facing readiness report.
+ProofKit is a local-first hackathon submission readiness scanner. It lets a builder upload a project ZIP, customize the hackathon brief, extracts repository evidence in the browser, and asks GPT-5.6 for a judge-facing readiness report.
 
 ## What it checks
 
 - Working project evidence from manifests, setup scripts, lockfiles, and commands.
-- Developer Tools track alignment.
+- Custom hackathon name, deadline, track/category, requirements, and judging criteria.
+- Track/category alignment.
 - Public repo, README, demo video, Codex/GPT-5.6 explanation, `/feedback` session ID, and install/test path.
 - Technical implementation signals: setup clarity, runnable commands, testability, and product completeness.
 - Missing-risk items that could block judging.
@@ -36,11 +37,12 @@ The dashboard still performs a local evidence scan when the API key is missing.
 2. Create `.env.local` with `OPENAI_API_KEY` and `OPENAI_MODEL=gpt-5.6`.
 3. Run `npm run dev`.
 4. Open http://localhost:3000.
-5. Click `Load bundled sample`.
-6. Optionally click `Download sample ZIP`, then upload that ZIP to verify the file path.
-7. Click `Generate GPT-5.6 report`.
-8. Review the score, Devpost readiness panel, checklist, evidence table, README section, demo script, and judge testing instructions.
-9. Use `Copy full report` or `Download .md` to export the judge-facing handoff.
+5. Review or edit the hackathon name, deadline, requirements, judging criteria, and selected track.
+6. Click `Load bundled sample`.
+7. Optionally click `Download sample ZIP`, then upload that ZIP to verify the file path.
+8. Click `Generate GPT-5.6 report`.
+9. Review the score, Devpost readiness panel, custom checklist, evidence table, README section, demo script, and judge testing instructions.
+10. Use `Copy full report` or `Download .md` to export the judge-facing handoff.
 
 You can also upload any repository ZIP. ProofKit parses the file tree locally and extracts relevant text evidence before sending a compact summary to the server route.
 
@@ -52,7 +54,7 @@ You can also upload any repository ZIP. ProofKit parses the file tree locally an
 
 ## Bundled sample
 
-The app includes an in-memory sample project called BeaconBoard so judges can test without providing their own ZIP. The same sample is represented under `samples/beaconboard/` for review and can be zipped manually if a file-upload test is preferred.
+The app includes an in-memory sample project called BeaconBoard so judges can test without providing their own ZIP. The same sample is represented under `samples/beaconboard/` for review and can be zipped manually if a file-upload test is preferred. The default hackathon brief is prefilled for OpenAI Build Week, but users can paste another hackathon's requirements and judging criteria before running the scan.
 
 ## How Codex and GPT-5.6 were used
 

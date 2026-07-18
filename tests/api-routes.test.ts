@@ -97,8 +97,15 @@ test("analyze route returns a structured report from OpenAI", async () => {
       assert.equal(init?.method, "POST");
       assert.equal((init?.headers as Record<string, string>).Authorization, "Bearer sk-test");
 
-      const requestBody = JSON.parse(String(init?.body)) as { model?: string };
+      const requestBody = JSON.parse(String(init?.body)) as {
+        model?: string;
+        input?: { content?: { text?: string }[] }[];
+      };
       assert.equal(requestBody.model, "gpt-5.6");
+      const userText = requestBody.input?.[1]?.content?.[0]?.text ?? "";
+      assert.match(userText, /Launch Jam/);
+      assert.match(userText, /Hardware demo allowed/);
+      assert.match(userText, /Originality/);
 
       return Response.json({ output_text: JSON.stringify(buildValidReport()) });
     };
@@ -168,7 +175,11 @@ function buildAnalyzeRequest(): Request {
     body: JSON.stringify({
       metadata: {
         projectName: "ProofKit",
+        hackathonName: "Launch Jam",
         track: "Developer Tools",
+        deadline: "August 1, 2026 at 11:59 PM ET",
+        requirementsText: "Public repo\nHardware demo allowed",
+        judgingCriteriaText: "Originality\nTechnical implementation",
       },
       evidence: {
         sourceName: "proofkit.zip",
@@ -195,7 +206,7 @@ function buildAnalyzeRequest(): Request {
 function buildValidReport() {
   const requirements = [
     "Working project",
-    "Developer Tools category",
+    "Selected category or track",
     "Public repository link",
     "Clear README",
     "Public demo video",

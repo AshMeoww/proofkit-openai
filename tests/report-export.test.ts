@@ -55,14 +55,24 @@ test("buildReportMarkdown creates a complete judge-facing handoff", () => {
 
   const markdown = buildReportMarkdown({
     projectName: "ProofKit",
+    hackathonName: "Launch Jam",
+    deadline: "August 1, 2026 at 11:59 PM ET",
     track: "Developer Tools",
+    requirementsText: "Public repo\nDemo video under 3 minutes",
+    judgingCriteriaText: "Technical implementation\nDesign",
     report,
     evidence,
     generatedAt: "2026-07-18T12:00:00.000Z",
   });
 
   assert.match(markdown, /^# ProofKit readiness report: ProofKit/m);
+  assert.match(markdown, /- \*\*Hackathon:\*\* Launch Jam/);
+  assert.match(markdown, /- \*\*Deadline:\*\* August 1, 2026 at 11:59 PM ET/);
   assert.match(markdown, /- \*\*Repository:\*\* Not provided/);
+  assert.match(markdown, /## Launch Jam requirement checklist/);
+  assert.match(markdown, /## Hackathon brief/);
+  assert.match(markdown, /- Public repo/);
+  assert.match(markdown, /- Technical implementation/);
   assert.match(markdown, /\| Public demo video \| FAIL \| No demo URL provided\. \| Record the 3-minute video\. \|/);
   assert.match(markdown, /- Demo video URL is missing\./);
   assert.match(markdown, /\| README\.md \| high \| Setup path found\. \|/);
