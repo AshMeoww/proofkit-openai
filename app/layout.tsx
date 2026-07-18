@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ProofKit",
-  description: "Build Week submission readiness scanner for developer tools.",
+  description: "Hackathon submission readiness scanner for developer teams.",
 };
 
 export default function RootLayout({
